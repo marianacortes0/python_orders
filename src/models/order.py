@@ -1,9 +1,18 @@
 from datetime import datetime
+from enum import Enum as PyEnum
 
-from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, DateTime, Enum, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from src.core.database import Base
+
+
+class OrderStatus(str, PyEnum):
+    PENDING = "pending"
+    CONFIRMED = "confirmed"
+    SHIPPED = "shipped"
+    DELIVERED = "delivered"
+    CANCELLED = "cancelled"
 
 
 class Supplier(Base):
@@ -29,7 +38,7 @@ class Product(Base):
     supplier_id = Column(Integer, ForeignKey("suppliers.id"), nullable=False)
     unit_price = Column(Float, nullable=False)
     package = Column(String(120), nullable=True)
-    is_discontinued = Column(Integer, nullable=False, default=0)
+    is_discontinued = Column(Boolean, nullable=False, default=False)
 
     supplier = relationship("Supplier", back_populates="products")
     items = relationship("OrderItem", back_populates="product")
@@ -55,6 +64,9 @@ class Order(Base):
     order_number = Column(String(50), unique=True, nullable=False, index=True)
     order_date = Column(DateTime, nullable=False, default=datetime.utcnow)
     total_amount = Column(Float, nullable=False, default=0.0)
+    status = Column(
+        Enum(OrderStatus), nullable=False, default=OrderStatus.PENDING
+    )
     customer_id = Column(Integer, ForeignKey("customers.id"), nullable=False)
 
     customer = relationship("Customer", back_populates="orders")

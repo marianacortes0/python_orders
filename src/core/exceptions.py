@@ -8,14 +8,19 @@ class AppException(Exception):
         super().__init__(self.detail)
 
 
-class NotFoundError(AppException):
-    status_code = 404
-    detail = "Recurso no encontrado"
+class BadRequestError(AppException):
+    status_code = 400
+    detail = "Solicitud inválida"
 
 
 class ValidationError(AppException):
-    status_code = 422
+    status_code = 400
     detail = "Datos inválidos"
+
+
+class NotFoundError(AppException):
+    status_code = 404
+    detail = "Recurso no encontrado"
 
 
 class ConflictError(AppException):
@@ -23,6 +28,6 @@ class ConflictError(AppException):
     detail = "Conflicto con el estado actual del recurso"
 
 
-class BadRequestError(AppException):
-    status_code = 400
-    detail = "Solicitud inválida"
+class InternalServerError(AppException):
+    status_code = 500
+    detail = "Error interno del servidor"
