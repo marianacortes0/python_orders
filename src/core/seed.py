@@ -61,7 +61,7 @@ def seed_database(path: Path = SEED_FILE) -> None:
                         supplier_id=s["id"],
                         unit_price=p["unitPrice"],
                         package=p.get("package"),
-                        is_discontinued=int(bool(p.get("isDiscontinued", False))),
+                        is_discontinued=bool(p.get("isDiscontinued", False)),
                     )
                     db.add(products[p["id"]])
 
