@@ -5,7 +5,17 @@
       "Bash(python -c ' *)",
       "Bash(pip install *)",
       "Bash(rm -f orders.db)",
-      "Bash(cp -n Orders.json Orders.json)"
+      "Bash(cp -n Orders.json Orders.json)",
+      "Bash(python -c \"from main import app; print\\('OK'\\)\")",
+      "Bash(python -c \"import main\")",
+      "Bash(python -m uvicorn main:app --host 127.0.0.1 --port 8000)",
+      "Bash(curl -s http://127.0.0.1:8000/health)",
+      "Bash(python -c \"from src.core.config import settings; print\\('HOST:', settings.HOST, '| PORT:', settings.PORT\\)\")",
+      "Bash(taskkill /F /IM python.exe /T)",
+      "Bash(taskkill /F /IM uvicorn.exe /T)",
+      "PowerShell(Stop-Process -Name python -Force -ErrorAction SilentlyContinue)",
+      "PowerShell(Stop-Process -Name uvicorn -Force -ErrorAction SilentlyContinue)",
+      "Bash(python -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload)"
     ]
   }
 }
