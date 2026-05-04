@@ -1,0 +1,19 @@
+{
+  "name": "python-orders-frontend",
+  "version": "1.0.0",
+  "description": "Frontend para gestión de órdenes - servidor Express puerto 3001",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "method-override": "^3.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

@@ -1,0 +1,10 @@
+<%
+  const map = {
+    pending:   ['warning', 'Pendiente'],
+    confirmed: ['primary', 'Confirmado'],
+    shipped:   ['info',    'Enviado'],
+    delivered: ['success', 'Entregado'],
+    cancelled: ['danger',  'Cancelado'],
+  };
+  const [color, label] = map[status] || ['secondary', status];
+%><span class="badge bg-<%= color %>"><%= label %></span>

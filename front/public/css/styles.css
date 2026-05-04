@@ -1,0 +1,43 @@
+body {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  flex: 1;
+}
+
+.hover-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+}
+
+.hover-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.12) !important;
+}
+
+.table th {
+  font-size: .8rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.badge {
+  font-weight: 500;
+  letter-spacing: .03em;
+}
+
+.card {
+  border-radius: .75rem;
+}
+
+.navbar-brand {
+  letter-spacing: -.02em;
+}
+
+.breadcrumb {
+  font-size: .875rem;
+}

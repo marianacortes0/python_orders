@@ -1,0 +1,76 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0"><i class="bi bi-receipt me-2 text-primary"></i>Pedidos</h2>
+    <a href="/orders/new" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Nuevo Pedido</a>
+  </div>
+
+  <form class="row g-2 mb-4" method="get" action="/orders">
+    <div class="col-md-3">
+      <select name="status" class="form-select">
+        <option value="">Todos los estados</option>
+        <% statuses.forEach(s => { %>
+          <option value="<%= s %>" <%= query.status === s ? 'selected' : '' %>><%= s.charAt(0).toUpperCase() + s.slice(1) %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <input type="date" name="dateFrom" class="form-control" placeholder="Desde" value="<%= query.dateFrom || '' %>">
+    </div>
+    <div class="col-md-3">
+      <input type="date" name="dateTo" class="form-control" placeholder="Hasta" value="<%= query.dateTo || '' %>">
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-outline-secondary w-100" type="submit"><i class="bi bi-search me-1"></i>Filtrar</button>
+    </div>
+    <div class="col-md-1">
+      <a href="/orders" class="btn btn-outline-danger w-100" title="Limpiar"><i class="bi bi-x-lg"></i></a>
+    </div>
+  </form>
+
+  <div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-dark">
+          <tr>
+            <th>#</th>
+            <th>N° Pedido</th>
+            <th>Cliente</th>
+            <th>Fecha</th>
+            <th>Total</th>
+            <th>Estado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (items.length === 0) { %>
+            <tr><td colspan="7" class="text-center text-muted py-4">Sin resultados</td></tr>
+          <% } %>
+          <% items.forEach(o => { %>
+          <tr>
+            <td class="text-muted"><%= o.id %></td>
+            <td class="fw-semibold"><%= o.orderNumber %></td>
+            <td>
+              <a href="/customers/<%= o.customer.id %>" class="text-decoration-none">
+                <%= o.customer.firstName %> <%= o.customer.lastName %>
+              </a>
+            </td>
+            <td><%= new Date(o.orderDate).toLocaleDateString('es-AR') %></td>
+            <td class="fw-semibold">$<%= o.totalAmount.toFixed(2) %></td>
+            <td><%- include('../partials/statusBadge', { status: o.status }) %></td>
+            <td>
+              <a href="/orders/<%= o.id %>" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <%- include('../partials/pagination', { page, limit, total, base: '/orders', query }) %>
+</div>
+
+<%- include('../partials/footer') %>

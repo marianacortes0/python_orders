@@ -1,0 +1,140 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<div class="container py-4">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/orders">Pedidos</a></li>
+      <li class="breadcrumb-item active">Pedido #<%= order.orderNumber %></li>
+    </ol>
+  </nav>
+
+  <div class="row g-4">
+    <!-- Info del pedido -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="fw-bold mb-0">Pedido #<%= order.orderNumber %></h5>
+            <%- include('../partials/statusBadge', { status: order.status }) %>
+          </div>
+          <ul class="list-unstyled text-muted small">
+            <li><i class="bi bi-calendar me-2"></i><%= new Date(order.orderDate).toLocaleDateString('es-AR') %></li>
+            <li class="mt-1"><i class="bi bi-person me-2"></i>
+              <a href="/customers/<%= order.customer.id %>">
+                <%= order.customer.firstName %> <%= order.customer.lastName %>
+              </a>
+            </li>
+            <li class="mt-1"><i class="bi bi-cash-stack me-2"></i><strong>$<%= order.totalAmount.toFixed(2) %></strong></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Cambiar estado -->
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+          <h6 class="fw-semibold mb-3">Cambiar estado</h6>
+          <form method="post" action="/orders/<%= order.id %>/status">
+            <div class="input-group">
+              <select name="status" class="form-select">
+                <% statuses.forEach(s => { %>
+                  <option value="<%= s %>" <%= order.status === s ? 'selected' : '' %>><%= s.charAt(0).toUpperCase() + s.slice(1) %></option>
+                <% }) %>
+              </select>
+              <button class="btn btn-primary" type="submit"><i class="bi bi-check-lg"></i></button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Eliminar pedido -->
+      <form method="post" action="/orders/<%= order.id %>/delete"
+        onsubmit="return confirm('¿Eliminar este pedido? Esta acción no se puede deshacer.')">
+        <button type="submit" class="btn btn-outline-danger w-100">
+          <i class="bi bi-trash me-1"></i>Eliminar pedido
+        </button>
+      </form>
+    </div>
+
+    <!-- Ítems del pedido -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-header bg-white fw-semibold">
+          <i class="bi bi-list-ul me-2"></i>Ítems del pedido
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+                <th>Subtotal</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (!order.items || order.items.length === 0) { %>
+                <tr><td colspan="5" class="text-center text-muted py-3">Sin ítems</td></tr>
+              <% } %>
+              <% (order.items || []).forEach(item => { %>
+              <tr>
+                <td class="fw-semibold"><%= item.product ? item.product.productName : item.id %></td>
+                <td>$<%= item.unitPrice.toFixed(2) %></td>
+                <td>
+                  <form method="post" action="/orders/<%= order.id %>/items/<%= item.id %>/update" class="d-flex gap-1">
+                    <input type="number" name="quantity" value="<%= item.quantity %>" min="1" class="form-control form-control-sm" style="width:70px">
+                    <button class="btn btn-sm btn-outline-primary" type="submit" title="Actualizar cantidad"><i class="bi bi-check-lg"></i></button>
+                  </form>
+                </td>
+                <td>$<%= (item.unitPrice * item.quantity).toFixed(2) %></td>
+                <td>
+                  <form method="post" action="/orders/<%= order.id %>/items/<%= item.id %>/delete"
+                    onsubmit="return confirm('¿Eliminar este ítem?')">
+                    <button class="btn btn-sm btn-outline-danger" type="submit"><i class="bi bi-trash"></i></button>
+                  </form>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Agregar ítem -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white fw-semibold">
+          <i class="bi bi-plus-circle me-2"></i>Agregar ítem
+        </div>
+        <div class="card-body">
+          <form method="post" action="/orders/<%= order.id %>/items">
+            <div class="row g-2">
+              <div class="col-md-5">
+                <label class="form-label small fw-semibold">Producto</label>
+                <select name="productId" class="form-select form-select-sm" required>
+                  <option value="">Seleccionar...</option>
+                  <% (products || []).forEach(p => { %>
+                    <option value="<%= p.id %>"><%= p.productName %> — $<%= p.unitPrice.toFixed(2) %></option>
+                  <% }) %>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">Cantidad</label>
+                <input type="number" name="quantity" min="1" value="1" class="form-control form-control-sm" required>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">Precio (opcional)</label>
+                <input type="number" step="0.01" name="unitPrice" class="form-control form-control-sm" placeholder="Auto">
+              </div>
+              <div class="col-md-1 d-flex align-items-end">
+                <button class="btn btn-primary btn-sm w-100" type="submit"><i class="bi bi-plus-lg"></i></button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

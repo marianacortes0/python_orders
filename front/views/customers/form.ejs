@@ -1,0 +1,62 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<div class="container py-4" style="max-width:600px">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/customers">Clientes</a></li>
+      <% if (customer) { %>
+        <li class="breadcrumb-item"><a href="/customers/<%= customer.id %>"><%= customer.firstName %> <%= customer.lastName %></a></li>
+        <li class="breadcrumb-item active">Editar</li>
+      <% } else { %>
+        <li class="breadcrumb-item active">Nuevo</li>
+      <% } %>
+    </ol>
+  </nav>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <h4 class="fw-bold mb-4"><%= title %></h4>
+
+      <% if (errors) { %>
+        <div class="alert alert-danger"><i class="bi bi-exclamation-circle me-2"></i><%= errors.detail || 'Error en el formulario' %></div>
+      <% } %>
+
+      <form method="post" action="<%= customer ? '/customers/' + customer.id : '/customers' %>">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Nombre <span class="text-danger">*</span></label>
+            <input type="text" name="firstName" class="form-control" required
+              value="<%= customer ? customer.firstName : '' %>">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Apellido <span class="text-danger">*</span></label>
+            <input type="text" name="lastName" class="form-control" required
+              value="<%= customer ? customer.lastName : '' %>">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Ciudad</label>
+            <input type="text" name="city" class="form-control"
+              value="<%= customer ? (customer.city || '') : '' %>">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">País</label>
+            <input type="text" name="country" class="form-control"
+              value="<%= customer ? (customer.country || '') : '' %>">
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Teléfono</label>
+            <input type="text" name="phone" class="form-control"
+              value="<%= customer ? (customer.phone || '') : '' %>">
+          </div>
+          <div class="col-12 d-flex gap-2 mt-2">
+            <button type="submit" class="btn btn-success"><i class="bi bi-check-lg me-1"></i>Guardar</button>
+            <a href="<%= customer ? '/customers/' + customer.id : '/customers' %>" class="btn btn-outline-secondary">Cancelar</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,69 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0"><i class="bi bi-bag me-2 text-warning"></i>Productos</h2>
+    <a href="/products/new" class="btn btn-warning text-dark"><i class="bi bi-plus-lg me-1"></i>Nuevo Producto</a>
+  </div>
+
+  <form class="row g-2 mb-4" method="get" action="/products">
+    <div class="col-md-4">
+      <input type="text" name="search" class="form-control" placeholder="Buscar producto..." value="<%= query.search || '' %>">
+    </div>
+    <div class="col-md-3">
+      <select name="discontinued" class="form-select">
+        <option value="">Todos</option>
+        <option value="false" <%= query.discontinued === 'false' ? 'selected' : '' %>>Solo activos</option>
+        <option value="true" <%= query.discontinued === 'true' ? 'selected' : '' %>>Descontinuados</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <button class="btn btn-outline-secondary w-100" type="submit"><i class="bi bi-search me-1"></i>Filtrar</button>
+    </div>
+    <div class="col-md-2">
+      <a href="/products" class="btn btn-outline-danger w-100">Limpiar</a>
+    </div>
+  </form>
+
+  <div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-dark">
+          <tr>
+            <th>#</th>
+            <th>Producto</th>
+            <th>Proveedor</th>
+            <th>Precio</th>
+            <th>Envase</th>
+            <th>Estado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (items.length === 0) { %>
+            <tr><td colspan="7" class="text-center text-muted py-4">Sin resultados</td></tr>
+          <% } %>
+          <% items.forEach(p => { %>
+          <tr>
+            <td class="text-muted"><%= p.id %></td>
+            <td class="fw-semibold"><%= p.productName %></td>
+            <td><a href="/suppliers/<%= p.supplierId %>" class="text-decoration-none"><%= p.supplier ? p.supplier.companyName : p.supplierId %></a></td>
+            <td>$<%= p.unitPrice.toFixed(2) %></td>
+            <td><%= p.package || '—' %></td>
+            <td><span class="badge <%= p.isDiscontinued ? 'bg-secondary' : 'bg-success' %>"><%= p.isDiscontinued ? 'Descontinuado' : 'Activo' %></span></td>
+            <td class="text-end">
+              <a href="/products/<%= p.id %>" class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-eye"></i></a>
+              <a href="/products/<%= p.id %>/edit" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <%- include('../partials/pagination', { page, limit, total, base: '/products', query }) %>
+</div>
+
+<%- include('../partials/footer') %>
