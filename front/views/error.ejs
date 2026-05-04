@@ -1,4 +1,4 @@
-<%- include('partials/header') %>
+﻿<%- include('partials/header') %>
 <%- include('partials/navbar') %>
 
 <div class="page" style="text-align:center;padding-top:80px">
@@ -8,7 +8,6 @@
   <div id="btnVolver" style="display:inline-block"></div>
 </div>
 
-<%- include('partials/footer') %>
 
 <script>
   new DevExpress.ui.dxButton(document.getElementById('btnVolver'), {
@@ -16,3 +15,5 @@
     onClick: () => location.href = '/',
   });
 </script>
+
+<%- include('partials/footer') %>

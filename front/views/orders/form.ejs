@@ -1,4 +1,4 @@
-<%- include('../partials/header') %>
+﻿<%- include('../partials/header') %>
 <%- include('../partials/navbar') %>
 
 <div class="page" style="max-width:860px">
@@ -27,7 +27,6 @@
   </div>
 </div>
 
-<%- include('../partials/footer') %>
 
 <script>
   const customers = <%- JSON.stringify(customers) %>;
@@ -121,3 +120,5 @@
     text: 'Cancelar', type: 'normal', onClick: () => history.back(),
   });
 </script>
+
+<%- include('../partials/footer') %>

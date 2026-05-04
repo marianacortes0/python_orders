@@ -1,4 +1,4 @@
-<%- include('../partials/header') %>
+﻿<%- include('../partials/header') %>
 <%- include('../partials/navbar') %>
 
 <div class="page page-sm">
@@ -23,7 +23,6 @@
   </div>
 </div>
 
-<%- include('../partials/footer') %>
 
 <script>
   const isEdit = <%- customer ? 'true' : 'false' %>;
@@ -77,3 +76,5 @@
     onClick: () => history.back(),
   });
 </script>
+
+<%- include('../partials/footer') %>
