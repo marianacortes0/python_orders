@@ -1,0 +1,25 @@
+{
+  "sideEffects": [
+    "../../esm/common/core/events/click.js",
+    "../../esm/common/core/events/core/emitter.feedback.js",
+    "../../esm/common/core/events/hover.js",
+    "../../esm/common/core/localization/currency.js",
+    "../../esm/__internal/ui/list/modules/search.js",
+    "../../esm/__internal/ui/list/modules/selection.js",
+    "../../esm/__internal/ui/list/list.edit.decorator.selection.js",
+    "../../esm/ui/themes.js",
+    "../../esm/ui/toolbar/ui.toolbar.base.js",
+    "../../esm/ui/validation_summary.js",
+    "../../esm/ui/validation_group.js",
+    "../../esm/ui/text_box.js",
+    "../../esm/ui/number_box.js",
+    "../../esm/ui/check_box.js",
+    "../../esm/ui/date_box.js",
+    "../../esm/ui/toolbar.js",
+    "../../esm/ui/button.js",
+    "../../esm/ui/select_box.js"
+  ],
+  "main": "../../cjs/ui/card_view.js",
+  "module": "../../esm/ui/card_view.js",
+  "typings": "../card_view.d.ts"
+}

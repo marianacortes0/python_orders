@@ -1,63 +1,64 @@
 <%- include('../partials/header') %>
 <%- include('../partials/navbar') %>
 
-<div class="container py-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold mb-0"><i class="bi bi-people me-2 text-success"></i>Clientes</h2>
-    <a href="/customers/new" class="btn btn-success"><i class="bi bi-plus-lg me-1"></i>Nuevo Cliente</a>
+<div class="page">
+  <div class="page-header">
+    <h1 class="page-title">Clientes</h1>
+    <div id="btnNuevo"></div>
   </div>
-
-  <form class="row g-2 mb-4" method="get" action="/customers">
-    <div class="col-md-4">
-      <input type="text" name="search" class="form-control" placeholder="Buscar por nombre..." value="<%= query.search || '' %>">
-    </div>
-    <div class="col-md-3">
-      <input type="text" name="country" class="form-control" placeholder="País" value="<%= query.country || '' %>">
-    </div>
-    <div class="col-md-3">
-      <input type="text" name="city" class="form-control" placeholder="Ciudad" value="<%= query.city || '' %>">
-    </div>
-    <div class="col-md-2">
-      <button class="btn btn-outline-secondary w-100" type="submit"><i class="bi bi-search me-1"></i>Filtrar</button>
-    </div>
-  </form>
-
-  <div class="card border-0 shadow-sm">
-    <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
-        <thead class="table-dark">
-          <tr>
-            <th>#</th>
-            <th>Nombre</th>
-            <th>Ciudad</th>
-            <th>País</th>
-            <th>Teléfono</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <% if (items.length === 0) { %>
-            <tr><td colspan="6" class="text-center text-muted py-4">Sin resultados</td></tr>
-          <% } %>
-          <% items.forEach(c => { %>
-          <tr>
-            <td class="text-muted"><%= c.id %></td>
-            <td class="fw-semibold"><%= c.firstName %> <%= c.lastName %></td>
-            <td><%= c.city || '—' %></td>
-            <td><%= c.country || '—' %></td>
-            <td><%= c.phone || '—' %></td>
-            <td class="text-end">
-              <a href="/customers/<%= c.id %>" class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-eye"></i></a>
-              <a href="/customers/<%= c.id %>/edit" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
-            </td>
-          </tr>
-          <% }) %>
-        </tbody>
-      </table>
-    </div>
+  <div class="card" style="padding:0">
+    <div id="gridClientes"></div>
   </div>
-
-  <%- include('../partials/pagination', { page, limit, total, base: '/customers', query }) %>
 </div>
 
 <%- include('../partials/footer') %>
+
+<script>
+  const btnNuevo = new DevExpress.ui.dxButton(document.getElementById('btnNuevo'), {
+    text: 'Nuevo Cliente',
+    type: 'default',
+    icon: 'plus',
+    onClick: () => location.href = '/customers/new',
+  });
+
+  const store = new DevExpress.data.CustomStore({
+    key: 'id',
+    load: (opts) => {
+      const page  = Math.floor((opts.skip || 0) / (opts.take || 20)) + 1;
+      const limit = opts.take || 20;
+      const params = new URLSearchParams({ page, limit });
+      if (opts.searchValue) params.append('search', opts.searchValue);
+      return fetch(`/api/customers?${params}`)
+        .then(r => r.json())
+        .then(d => ({ data: d.items, totalCount: d.total }));
+    },
+  });
+
+  new DevExpress.ui.dxDataGrid(document.getElementById('gridClientes'), {
+    dataSource: store,
+    remoteOperations: { paging: true },
+    paging:  { pageSize: 20 },
+    pager:   { showPageSizeSelector: true, allowedPageSizes: [10, 20, 50], showInfo: true },
+    filterRow: { visible: true },
+    searchPanel: { visible: true, placeholder: 'Buscar...' },
+    showBorders: false,
+    showRowLines: true,
+    columnAutoWidth: true,
+    columns: [
+      { dataField: 'id',        caption: '#',        width: 60, allowFiltering: false },
+      { dataField: 'firstName', caption: 'Nombre' },
+      { dataField: 'lastName',  caption: 'Apellido' },
+      { dataField: 'city',      caption: 'Ciudad' },
+      { dataField: 'country',   caption: 'País' },
+      { dataField: 'phone',     caption: 'Teléfono', allowFiltering: false },
+      {
+        type: 'buttons',
+        width: 90,
+        buttons: [
+          { icon: 'eyeopen',  hint: 'Ver',    onClick: e => location.href = `/customers/${e.row.data.id}` },
+          { icon: 'edit',     hint: 'Editar', onClick: e => location.href = `/customers/${e.row.data.id}/edit` },
+        ],
+      },
+    ],
+  });
+</script>

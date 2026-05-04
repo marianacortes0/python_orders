@@ -3,8 +3,12 @@ const customerRoutes = require('./customerRoutes');
 const supplierRoutes = require('./supplierRoutes');
 const productRoutes = require('./productRoutes');
 const orderRoutes = require('./orderRoutes');
+const apiProxy = require('./apiProxy');
 
 const router = Router();
+
+// Proxy transparente hacia el backend — el browser llama /api/* sin CORS
+router.use('/api', apiProxy);
 
 router.get('/', (req, res) => res.render('index', { title: 'Dashboard - Python Orders' }));
 

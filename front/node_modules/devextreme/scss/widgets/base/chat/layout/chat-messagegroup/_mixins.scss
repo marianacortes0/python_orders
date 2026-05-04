@@ -1,0 +1,56 @@
+@use "../../../icon_fonts" as *;
+
+@mixin chat-messagegroup(
+  $messagegroup-gap,
+  $messagegroup-start-template,
+  $messagegroup-start-gap,
+  $messagegroup-padding,
+  $information-font-size,
+  $information-author-name-color,
+  $information-timestamp-color,
+  $information-gap,
+  $information-icon-size,
+  $information-edited-gap,
+) {
+  .dx-chat-messagegroup {
+    row-gap: $messagegroup-gap;
+    padding-bottom: $messagegroup-padding;
+
+    &:first-child {
+      padding-top: $messagegroup-padding;
+    }
+  }
+
+  .dx-chat-messagegroup-information {
+    column-gap: $information-gap;
+  }
+
+  .dx-chat-messagegroup-alignment-start {
+    grid-template-columns: $messagegroup-start-template;
+  }
+
+  .dx-chat-messagegroup-alignment-start:has(.dx-avatar) {
+    column-gap: $messagegroup-start-gap;
+  }
+
+  .dx-chat-messagegroup-time {
+    font-size: $information-font-size;
+    color: $information-timestamp-color;
+  }
+
+  .dx-chat-messagegroup-author-name {
+    font-size: $information-font-size;
+    color: $information-author-name-color;
+  }
+
+  .dx-chat-message-edited {
+    font-size: $information-font-size;
+    color: $information-author-name-color;
+    column-gap: $information-edited-gap;
+
+    .dx-chat-message-edited-icon {
+      @include dx-icon(edit);
+      @include dx-icon-sizing($information-icon-size);
+    }
+  }
+}

@@ -1,0 +1,149 @@
+@use "sass:math";
+
+// adduse
+
+$loadindicator-width: 32px;
+$loadindicator-height: 32px;
+
+.dx-loadindicator {
+  width: $loadindicator-width;
+  height: $loadindicator-height;
+  display: inline-block;
+  overflow: hidden;
+  border: none;
+  background-color: transparent;
+}
+
+.dx-loadindicator-wrapper {
+  width: 100%;
+  height: 100%;
+  font-size: $loadindicator-height;
+  margin: auto;
+}
+
+.dx-loadindicator-image {
+  background-size: contain;
+  transform-origin: 50% 50%;
+  background-position: 50%;
+  background-repeat: no-repeat;
+}
+
+.dx-loadindicator-icon {
+  direction: ltr;
+}
+
+.dx-loadindicator-icon-custom {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-size: 100% 100%;
+  transform-origin: 50% 50%;
+  animation: dx-loadindicator-icon-custom-rotate 1.5s infinite linear;
+
+  @keyframes dx-loadindicator-icon-custom-rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+}
+
+.dx-loadindicator-container {
+  > .dx-loadindicator {
+    top: 50%;
+    left: 50%;
+    position: absolute;
+    margin-top: math.div(-1 * $loadindicator-height, 2);
+    margin-left: math.div(-1 * $loadindicator-width, 2);
+
+    &.dx-loadindicator {
+      margin-top: math.div(-1 * $loadindicator-height, 2);
+      margin-left: math.div(-1 * $loadindicator-width, 2);
+    }
+  }
+}
+
+.dx-loadindicator-content {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+@mixin loadindicator-animation-sparkle(
+  $bg-color1,
+  $bg-color2,
+  $bg-color3
+) {
+  .dx-loadindicator-content-sparkle {
+    .dx-loadindicator-segment {
+      position: absolute;
+      width: 37.5%;
+      height: 37.5%;
+      aspect-ratio: 1;
+      clip-path: polygon(
+        48.76% 3.14%,
+        51.24% 3.14%,
+        63.93% 35.32%,
+        64.68% 36.07%,
+        96.86% 48.76%,
+        96.86% 51.24%,
+        64.68% 63.93%,
+        63.93% 64.68%,
+        51.24% 96.86%,
+        48.76% 96.86%,
+        36.07% 64.68%,
+        35.32% 63.93%,
+        3.14% 51.24%,
+        3.14% 48.76%,
+        35.32% 36.07%,
+        36.07% 35.32%,
+        48.76% 3.14%
+      );
+      transform-origin: center;
+      transform: scale(0.33);
+      background-color: $bg-color3;
+      animation: dx-sparkle-scale 1.4s infinite linear;
+    }
+
+    .dx-loadindicator-segment0 {
+      left: 50%;
+      top: 9.375%;
+      background-color: $bg-color3;
+      animation-delay: 0s;
+    }
+
+    .dx-loadindicator-segment1 {
+      left: 9.375%;
+      top: 29.6875%;
+      background-color: $bg-color3;
+      animation-delay: 0.8s;
+    }
+
+    .dx-loadindicator-segment2 {
+      left: 40.625%;
+      top: 54.6875%;
+      background-color: $bg-color3;
+      animation-delay: 0.4s;
+    }
+  }
+
+  @keyframes dx-sparkle-scale {
+    0% {
+      transform: scale(0.33);
+      background-color: $bg-color3;
+    }
+
+    33% {
+      transform: scale(1);
+      background-color: $bg-color1;
+    }
+
+    66% {
+      transform: scale(0.66);
+      background-color: $bg-color2;
+    }
+
+    100% {
+      transform: scale(0.33);
+      background-color: $bg-color3;
+    }
+  }
+}

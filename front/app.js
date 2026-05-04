@@ -13,6 +13,13 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
+
+// Servir DevExtreme desde node_modules
+app.use('/dx/css', express.static(path.join(__dirname, 'node_modules/devextreme/dist/css')));
+app.use('/dx/js',  express.static(path.join(__dirname, 'node_modules/devextreme/bundles')));
+app.use('/dx/icons', express.static(path.join(__dirname, 'node_modules/devextreme/dist/css/icons')));
+app.use('/dx/fonts', express.static(path.join(__dirname, 'node_modules/devextreme/dist/css/fonts')));
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);

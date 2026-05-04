@@ -1,111 +1,123 @@
 <%- include('../partials/header') %>
 <%- include('../partials/navbar') %>
 
-<div class="container py-4" style="max-width:760px">
-  <nav aria-label="breadcrumb" class="mb-3">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="/orders">Pedidos</a></li>
-      <li class="breadcrumb-item active">Nuevo Pedido</li>
-    </ol>
-  </nav>
+<div class="page" style="max-width:860px">
+  <div class="breadcrumb">
+    <a href="/orders">Pedidos</a>
+    <span class="breadcrumb-sep">/</span>
+    <span>Nuevo</span>
+  </div>
 
-  <div class="card border-0 shadow-sm">
-    <div class="card-body p-4">
-      <h4 class="fw-bold mb-4"><%= title %></h4>
+  <div class="card">
+    <div class="card-title">Nuevo Pedido</div>
+    <div id="formPedido"></div>
+  </div>
 
-      <% if (errors) { %>
-        <div class="alert alert-danger"><i class="bi bi-exclamation-circle me-2"></i><%= errors.detail || 'Error en el formulario' %></div>
-      <% } %>
-
-      <form method="post" action="/orders" id="orderForm">
-        <div class="row g-3 mb-4">
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">Cliente <span class="text-danger">*</span></label>
-            <select name="customerId" class="form-select" required>
-              <option value="">Seleccionar cliente...</option>
-              <% customers.forEach(c => { %>
-                <option value="<%= c.id %>"><%= c.firstName %> <%= c.lastName %> (<%= c.country || '—' %>)</option>
-              <% }) %>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label fw-semibold">N° de Pedido</label>
-            <input type="text" name="orderNumber" class="form-control" placeholder="Auto-generado">
-          </div>
-          <div class="col-md-3">
-            <label class="form-label fw-semibold">Fecha</label>
-            <input type="datetime-local" name="orderDate" class="form-control">
-          </div>
-        </div>
-
-        <h6 class="fw-bold mb-3">Ítems <span class="text-danger">*</span></h6>
-        <div id="itemsContainer">
-          <div class="row g-2 mb-2 item-row">
-            <div class="col-md-5">
-              <select name="productId" class="form-select form-select-sm" required>
-                <option value="">Producto...</option>
-                <% products.forEach(p => { %>
-                  <option value="<%= p.id %>"><%= p.productName %> — $<%= p.unitPrice.toFixed(2) %></option>
-                <% }) %>
-              </select>
-            </div>
-            <div class="col-md-3">
-              <input type="number" name="quantity" min="1" value="1" class="form-control form-control-sm" placeholder="Cantidad" required>
-            </div>
-            <div class="col-md-3">
-              <input type="number" step="0.01" name="unitPrice" class="form-control form-control-sm" placeholder="Precio (auto)">
-            </div>
-            <div class="col-md-1">
-              <button type="button" class="btn btn-outline-danger btn-sm w-100 remove-item"><i class="bi bi-x-lg"></i></button>
-            </div>
-          </div>
-        </div>
-
-        <button type="button" id="addItem" class="btn btn-outline-secondary btn-sm mb-4">
-          <i class="bi bi-plus-lg me-1"></i>Agregar ítem
-        </button>
-
-        <div class="d-flex gap-2">
-          <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Crear Pedido</button>
-          <a href="/orders" class="btn btn-outline-secondary">Cancelar</a>
-        </div>
-      </form>
+  <div class="card">
+    <div class="card-title">Ítems <span style="color:#c62828">*</span></div>
+    <div id="gridItems"></div>
+    <div class="mt-16" style="display:flex;gap:8px">
+      <div id="btnAgregarItem"></div>
     </div>
+  </div>
+
+  <div style="display:flex;gap:8px">
+    <div id="btnGuardar"></div>
+    <div id="btnCancelar"></div>
   </div>
 </div>
 
-<script>
-  const productsHtml = `<% products.forEach(p => { %><option value="<%= p.id %>"><%= p.productName %> — $<%= p.unitPrice.toFixed(2) %></option><% }) %>`;
+<%- include('../partials/footer') %>
 
-  document.getElementById('addItem').addEventListener('click', () => {
-    const container = document.getElementById('itemsContainer');
-    const row = document.createElement('div');
-    row.className = 'row g-2 mb-2 item-row';
-    row.innerHTML = `
-      <div class="col-md-5">
-        <select name="productId" class="form-select form-select-sm" required>
-          <option value="">Producto...</option>
-          ${productsHtml}
-        </select>
-      </div>
-      <div class="col-md-3">
-        <input type="number" name="quantity" min="1" value="1" class="form-control form-control-sm" placeholder="Cantidad" required>
-      </div>
-      <div class="col-md-3">
-        <input type="number" step="0.01" name="unitPrice" class="form-control form-control-sm" placeholder="Precio (auto)">
-      </div>
-      <div class="col-md-1">
-        <button type="button" class="btn btn-outline-danger btn-sm w-100 remove-item"><i class="bi bi-x-lg"></i></button>
-      </div>`;
-    container.appendChild(row);
+<script>
+  const customers = <%- JSON.stringify(customers) %>;
+  const products  = <%- JSON.stringify(products) %>;
+  const items = [];
+
+  const form = new DevExpress.ui.dxForm(document.getElementById('formPedido'), {
+    formData: {},
+    labelLocation: 'top',
+    colCount: 3,
+    items: [
+      {
+        dataField: 'customerId', label: { text: 'Cliente' }, colSpan: 2,
+        editorType: 'dxSelectBox',
+        editorOptions: { dataSource: customers, valueExpr: 'id', displayExpr: d => `${d.firstName} ${d.lastName}`, searchEnabled: true, placeholder: 'Seleccionar...' },
+        validationRules: [{ type: 'required', message: 'Requerido' }],
+      },
+      {
+        dataField: 'orderNumber', label: { text: 'N° Pedido' },
+        editorOptions: { placeholder: 'Auto-generado' },
+      },
+      {
+        dataField: 'orderDate', label: { text: 'Fecha' },
+        editorType: 'dxDateBox',
+        editorOptions: { type: 'datetime', displayFormat: 'dd/MM/yyyy HH:mm' },
+      },
+    ],
   });
 
-  document.getElementById('itemsContainer').addEventListener('click', (e) => {
-    if (e.target.closest('.remove-item')) {
-      const rows = document.querySelectorAll('.item-row');
-      if (rows.length > 1) e.target.closest('.item-row').remove();
-    }
+  // ── DataGrid editable local para ítems ──
+  const itemsSource = new DevExpress.data.ArrayStore({ key: '_id', data: items });
+
+  const gridItems = new DevExpress.ui.dxDataGrid(document.getElementById('gridItems'), {
+    dataSource: new DevExpress.data.DataSource({ store: itemsSource }),
+    showBorders: true,
+    editing: { mode: 'row', allowUpdating: true, allowDeleting: true, newRowPosition: 'last' },
+    columns: [
+      {
+        dataField: 'productId', caption: 'Producto',
+        lookup: { dataSource: products, valueExpr: 'id', displayExpr: 'productName' },
+        validationRules: [{ type: 'required' }],
+      },
+      { dataField: 'quantity',  caption: 'Cantidad', dataType: 'number', validationRules: [{ type: 'required' }, { type: 'range', min: 1 }] },
+      { dataField: 'unitPrice', caption: 'Precio (opcional)', dataType: 'number' },
+    ],
+    onRowInserted: (e) => { e.data._id = Date.now(); },
+  });
+
+  new DevExpress.ui.dxButton(document.getElementById('btnAgregarItem'), {
+    text: 'Agregar fila', icon: 'plus', type: 'normal',
+    onClick: () => gridItems.addRow(),
+  });
+
+  new DevExpress.ui.dxButton(document.getElementById('btnGuardar'), {
+    text: 'Crear Pedido', type: 'default', icon: 'check',
+    onClick: async () => {
+      if (!form.validate().isValid) return;
+
+      const rows = gridItems.getDataSource().items();
+      if (!rows.length) {
+        DevExpress.ui.notify('Agregá al menos un ítem', 'warning', 3000);
+        return;
+      }
+
+      const formData = form.option('formData');
+      const payload = {
+        customerId:  formData.customerId,
+        orderNumber: formData.orderNumber || undefined,
+        orderDate:   formData.orderDate   || undefined,
+        items: rows.map(r => ({
+          productId: r.productId,
+          quantity:  r.quantity,
+          unitPrice: r.unitPrice || undefined,
+        })),
+      };
+
+      try {
+        const res = await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) { DevExpress.ui.notify((await res.json()).detail || 'Error al crear', 'error', 3000); return; }
+        const saved = await res.json();
+        location.href = `/orders/${saved.id}`;
+      } catch { DevExpress.ui.notify('Error de conexión', 'error', 3000); }
+    },
+  });
+
+  new DevExpress.ui.dxButton(document.getElementById('btnCancelar'), {
+    text: 'Cancelar', type: 'normal', onClick: () => history.back(),
   });
 </script>
-
-<%- include('../partials/footer') %>

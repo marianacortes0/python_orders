@@ -1,62 +1,79 @@
 <%- include('../partials/header') %>
 <%- include('../partials/navbar') %>
 
-<div class="container py-4" style="max-width:600px">
-  <nav aria-label="breadcrumb" class="mb-3">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="/customers">Clientes</a></li>
-      <% if (customer) { %>
-        <li class="breadcrumb-item"><a href="/customers/<%= customer.id %>"><%= customer.firstName %> <%= customer.lastName %></a></li>
-        <li class="breadcrumb-item active">Editar</li>
-      <% } else { %>
-        <li class="breadcrumb-item active">Nuevo</li>
-      <% } %>
-    </ol>
-  </nav>
+<div class="page page-sm">
+  <div class="breadcrumb">
+    <a href="/customers">Clientes</a>
+    <span class="breadcrumb-sep">/</span>
+    <% if (customer) { %>
+      <a href="/customers/<%= customer.id %>"><%= customer.firstName %> <%= customer.lastName %></a>
+      <span class="breadcrumb-sep">/</span><span>Editar</span>
+    <% } else { %>
+      <span>Nuevo</span>
+    <% } %>
+  </div>
 
-  <div class="card border-0 shadow-sm">
-    <div class="card-body p-4">
-      <h4 class="fw-bold mb-4"><%= title %></h4>
-
-      <% if (errors) { %>
-        <div class="alert alert-danger"><i class="bi bi-exclamation-circle me-2"></i><%= errors.detail || 'Error en el formulario' %></div>
-      <% } %>
-
-      <form method="post" action="<%= customer ? '/customers/' + customer.id : '/customers' %>">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">Nombre <span class="text-danger">*</span></label>
-            <input type="text" name="firstName" class="form-control" required
-              value="<%= customer ? customer.firstName : '' %>">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">Apellido <span class="text-danger">*</span></label>
-            <input type="text" name="lastName" class="form-control" required
-              value="<%= customer ? customer.lastName : '' %>">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">Ciudad</label>
-            <input type="text" name="city" class="form-control"
-              value="<%= customer ? (customer.city || '') : '' %>">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">País</label>
-            <input type="text" name="country" class="form-control"
-              value="<%= customer ? (customer.country || '') : '' %>">
-          </div>
-          <div class="col-12">
-            <label class="form-label fw-semibold">Teléfono</label>
-            <input type="text" name="phone" class="form-control"
-              value="<%= customer ? (customer.phone || '') : '' %>">
-          </div>
-          <div class="col-12 d-flex gap-2 mt-2">
-            <button type="submit" class="btn btn-success"><i class="bi bi-check-lg me-1"></i>Guardar</button>
-            <a href="<%= customer ? '/customers/' + customer.id : '/customers' %>" class="btn btn-outline-secondary">Cancelar</a>
-          </div>
-        </div>
-      </form>
+  <div class="card">
+    <div class="card-title"><%= title %></div>
+    <div id="formCliente"></div>
+    <div class="mt-24" style="display:flex;gap:8px">
+      <div id="btnGuardar"></div>
+      <div id="btnCancelar"></div>
     </div>
   </div>
 </div>
 
 <%- include('../partials/footer') %>
+
+<script>
+  const isEdit = <%- customer ? 'true' : 'false' %>;
+  const customerId = <%- customer ? customer.id : 'null' %>;
+  const initialData = <%- JSON.stringify(customer || {}) %>;
+
+  const form = new DevExpress.ui.dxForm(document.getElementById('formCliente'), {
+    formData: Object.assign({}, initialData),
+    labelLocation: 'top',
+    colCount: 2,
+    items: [
+      { dataField: 'firstName', label: { text: 'Nombre' },   validationRules: [{ type: 'required', message: 'Requerido' }] },
+      { dataField: 'lastName',  label: { text: 'Apellido' }, validationRules: [{ type: 'required', message: 'Requerido' }] },
+      { dataField: 'city',    label: { text: 'Ciudad' } },
+      { dataField: 'country', label: { text: 'País' } },
+      { dataField: 'phone',   label: { text: 'Teléfono' }, colSpan: 2 },
+    ],
+  });
+
+  new DevExpress.ui.dxButton(document.getElementById('btnGuardar'), {
+    text: 'Guardar', type: 'default', icon: 'check',
+    onClick: async () => {
+      const result = form.validate();
+      if (!result.isValid) return;
+
+      const data = form.option('formData');
+      const url    = isEdit ? `/api/customers/${customerId}` : '/api/customers';
+      const method = isEdit ? 'PATCH' : 'POST';
+
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          DevExpress.ui.notify(err.detail || 'Error al guardar', 'error', 3000);
+          return;
+        }
+        const saved = await res.json();
+        location.href = `/customers/${saved.id}`;
+      } catch (e) {
+        DevExpress.ui.notify('Error de conexión', 'error', 3000);
+      }
+    },
+  });
+
+  new DevExpress.ui.dxButton(document.getElementById('btnCancelar'), {
+    text: 'Cancelar', type: 'normal',
+    onClick: () => history.back(),
+  });
+</script>

@@ -16,7 +16,8 @@
       "PowerShell(Stop-Process -Name python -Force -ErrorAction SilentlyContinue)",
       "PowerShell(Stop-Process -Name uvicorn -Force -ErrorAction SilentlyContinue)",
       "Bash(python -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload)",
-      "PowerShell(Get-ChildItem c:\\\\Users\\\\maria\\\\python_orders -Name | Where-Object { $_ -notmatch \"^venv\" -and $_ -notmatch \"^node_modules\" })"
+      "PowerShell(Get-ChildItem c:\\\\Users\\\\maria\\\\python_orders -Name | Where-Object { $_ -notmatch \"^venv\" -and $_ -notmatch \"^node_modules\" })",
+      "PowerShell(Get-ChildItem \"c:\\\\Users\\\\maria\\\\python_orders\\\\front\" -Recurse -File | Where-Object { $_.DirectoryName -notmatch \"node_modules\" } | Select-Object FullName, Length)"
     ]
   }
 }

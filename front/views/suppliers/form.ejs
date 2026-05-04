@@ -1,72 +1,67 @@
 <%- include('../partials/header') %>
 <%- include('../partials/navbar') %>
 
-<div class="container py-4" style="max-width:640px">
-  <nav aria-label="breadcrumb" class="mb-3">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="/suppliers">Proveedores</a></li>
-      <% if (supplier) { %>
-        <li class="breadcrumb-item"><a href="/suppliers/<%= supplier.id %>"><%= supplier.companyName %></a></li>
-        <li class="breadcrumb-item active">Editar</li>
-      <% } else { %>
-        <li class="breadcrumb-item active">Nuevo</li>
-      <% } %>
-    </ol>
-  </nav>
+<div class="page page-sm">
+  <div class="breadcrumb">
+    <a href="/suppliers">Proveedores</a>
+    <span class="breadcrumb-sep">/</span>
+    <% if (supplier) { %>
+      <a href="/suppliers/<%= supplier.id %>"><%= supplier.companyName %></a>
+      <span class="breadcrumb-sep">/</span><span>Editar</span>
+    <% } else { %>
+      <span>Nuevo</span>
+    <% } %>
+  </div>
 
-  <div class="card border-0 shadow-sm">
-    <div class="card-body p-4">
-      <h4 class="fw-bold mb-4"><%= title %></h4>
-
-      <% if (errors) { %>
-        <div class="alert alert-danger"><i class="bi bi-exclamation-circle me-2"></i><%= errors.detail || 'Error en el formulario' %></div>
-      <% } %>
-
-      <form method="post" action="<%= supplier ? '/suppliers/' + supplier.id : '/suppliers' %>">
-        <div class="row g-3">
-          <div class="col-12">
-            <label class="form-label fw-semibold">Empresa <span class="text-danger">*</span></label>
-            <input type="text" name="companyName" class="form-control" required
-              value="<%= supplier ? supplier.companyName : '' %>">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">Nombre de contacto</label>
-            <input type="text" name="contactName" class="form-control"
-              value="<%= supplier ? (supplier.contactName || '') : '' %>">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">Cargo</label>
-            <input type="text" name="contactTitle" class="form-control"
-              value="<%= supplier ? (supplier.contactTitle || '') : '' %>">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">Ciudad</label>
-            <input type="text" name="city" class="form-control"
-              value="<%= supplier ? (supplier.city || '') : '' %>">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">País</label>
-            <input type="text" name="country" class="form-control"
-              value="<%= supplier ? (supplier.country || '') : '' %>">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">Teléfono</label>
-            <input type="text" name="phone" class="form-control"
-              value="<%= supplier ? (supplier.phone || '') : '' %>">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">Fax</label>
-            <input type="text" name="fax" class="form-control"
-              value="<%= supplier ? (supplier.fax || '') : '' %>">
-          </div>
-          <div class="col-12 d-flex gap-2 mt-2">
-            <button type="submit" class="btn btn-danger"><i class="bi bi-check-lg me-1"></i>Guardar</button>
-            <a href="<%= supplier ? '/suppliers/' + supplier.id : '/suppliers' %>" class="btn btn-outline-secondary">Cancelar</a>
-          </div>
-        </div>
-      </form>
+  <div class="card">
+    <div class="card-title"><%= title %></div>
+    <div id="formProveedor"></div>
+    <div class="mt-24" style="display:flex;gap:8px">
+      <div id="btnGuardar"></div>
+      <div id="btnCancelar"></div>
     </div>
   </div>
 </div>
 
 <%- include('../partials/footer') %>
+
+<script>
+  const isEdit     = <%- supplier ? 'true' : 'false' %>;
+  const supplierId = <%- supplier ? supplier.id : 'null' %>;
+  const initialData = <%- JSON.stringify(supplier || {}) %>;
+
+  const form = new DevExpress.ui.dxForm(document.getElementById('formProveedor'), {
+    formData: Object.assign({}, initialData),
+    labelLocation: 'top',
+    colCount: 2,
+    items: [
+      { dataField: 'companyName',  label: { text: 'Empresa' },  colSpan: 2, validationRules: [{ type: 'required', message: 'Requerido' }] },
+      { dataField: 'contactName',  label: { text: 'Contacto' } },
+      { dataField: 'contactTitle', label: { text: 'Cargo' } },
+      { dataField: 'city',         label: { text: 'Ciudad' } },
+      { dataField: 'country',      label: { text: 'País' } },
+      { dataField: 'phone',        label: { text: 'Teléfono' } },
+      { dataField: 'fax',          label: { text: 'Fax' } },
+    ],
+  });
+
+  new DevExpress.ui.dxButton(document.getElementById('btnGuardar'), {
+    text: 'Guardar', type: 'default', icon: 'check',
+    onClick: async () => {
+      if (!form.validate().isValid) return;
+      const data   = form.option('formData');
+      const url    = isEdit ? `/api/suppliers/${supplierId}` : '/api/suppliers';
+      const method = isEdit ? 'PATCH' : 'POST';
+      try {
+        const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+        if (!res.ok) { DevExpress.ui.notify((await res.json()).detail || 'Error al guardar', 'error', 3000); return; }
+        const saved = await res.json();
+        location.href = `/suppliers/${saved.id}`;
+      } catch { DevExpress.ui.notify('Error de conexión', 'error', 3000); }
+    },
+  });
+
+  new DevExpress.ui.dxButton(document.getElementById('btnCancelar'), {
+    text: 'Cancelar', type: 'normal', onClick: () => history.back(),
+  });
+</script>

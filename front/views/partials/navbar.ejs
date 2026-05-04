@@ -1,32 +1,9 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-  <div class="container-fluid">
-    <a class="navbar-brand fw-bold" href="/"><i class="bi bi-box-seam me-2"></i>Python Orders</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navMenu">
-      <ul class="navbar-nav ms-auto gap-1">
-        <li class="nav-item">
-          <a class="nav-link <%= locals.title && title.toLowerCase().includes('pedido') ? 'active' : '' %>" href="/orders">
-            <i class="bi bi-receipt me-1"></i>Pedidos
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link <%= locals.title && title.toLowerCase().includes('cliente') ? 'active' : '' %>" href="/customers">
-            <i class="bi bi-people me-1"></i>Clientes
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link <%= locals.title && title.toLowerCase().includes('producto') ? 'active' : '' %>" href="/products">
-            <i class="bi bi-bag me-1"></i>Productos
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link <%= locals.title && title.toLowerCase().includes('proveedor') ? 'active' : '' %>" href="/suppliers">
-            <i class="bi bi-truck me-1"></i>Proveedores
-          </a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
+<header class="app-header">
+  <a class="app-logo" href="/"><span class="app-logo-icon">&#9707;</span> Python Orders</a>
+  <nav class="app-nav">
+    <a href="/orders"    class="app-nav-link">Pedidos</a>
+    <a href="/customers" class="app-nav-link">Clientes</a>
+    <a href="/products"  class="app-nav-link">Productos</a>
+    <a href="/suppliers" class="app-nav-link">Proveedores</a>
+  </nav>
+</header>

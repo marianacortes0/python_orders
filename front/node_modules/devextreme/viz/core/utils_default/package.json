@@ -1,0 +1,5 @@
+{
+  "sideEffects": false,
+  "main": "../../../cjs/viz/core/utils_default.js",
+  "module": "../../../esm/viz/core/utils_default.js"
+}

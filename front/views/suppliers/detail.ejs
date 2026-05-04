@@ -1,72 +1,77 @@
 <%- include('../partials/header') %>
 <%- include('../partials/navbar') %>
 
-<div class="container py-4">
-  <nav aria-label="breadcrumb" class="mb-3">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="/suppliers">Proveedores</a></li>
-      <li class="breadcrumb-item active"><%= supplier.companyName %></li>
-    </ol>
-  </nav>
+<div class="page">
+  <div class="breadcrumb">
+    <a href="/suppliers">Proveedores</a>
+    <span class="breadcrumb-sep">/</span>
+    <span><%= supplier.companyName %></span>
+  </div>
 
-  <div class="row g-4">
-    <div class="col-lg-4">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-start mb-3">
-            <h4 class="fw-bold mb-0"><%= supplier.companyName %></h4>
-            <span class="badge bg-danger">ID <%= supplier.id %></span>
-          </div>
-          <ul class="list-unstyled text-muted">
-            <% if (supplier.contactName) { %><li><i class="bi bi-person me-2"></i><%= supplier.contactName %><% if (supplier.contactTitle) { %> — <%= supplier.contactTitle %><% } %></li><% } %>
-            <li class="mt-1"><i class="bi bi-geo-alt me-2"></i><%= supplier.city || '—' %>, <%= supplier.country || '—' %></li>
-            <li class="mt-1"><i class="bi bi-telephone me-2"></i><%= supplier.phone || '—' %></li>
-            <% if (supplier.fax) { %><li class="mt-1"><i class="bi bi-printer me-2"></i><%= supplier.fax %></li><% } %>
-          </ul>
-          <a href="/suppliers/<%= supplier.id %>/edit" class="btn btn-outline-secondary btn-sm mt-2">
-            <i class="bi bi-pencil me-1"></i>Editar
-          </a>
-        </div>
-      </div>
+  <div class="page-header">
+    <h1 class="page-title"><%= supplier.companyName %></h1>
+    <div id="btnEditar"></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:300px 1fr;gap:20px">
+    <div class="card">
+      <div class="card-title">Datos del proveedor</div>
+      <ul class="detail-list">
+        <li><span class="label">ID</span><span class="value"><%= supplier.id %></span></li>
+        <% if (supplier.contactName) { %>
+        <li><span class="label">Contacto</span><span class="value"><%= supplier.contactName %></span></li>
+        <% } %>
+        <% if (supplier.contactTitle) { %>
+        <li><span class="label">Cargo</span><span class="value"><%= supplier.contactTitle %></span></li>
+        <% } %>
+        <li><span class="label">Ciudad</span><span class="value"><%= supplier.city || '—' %></span></li>
+        <li><span class="label">País</span><span class="value"><%= supplier.country || '—' %></span></li>
+        <li><span class="label">Teléfono</span><span class="value"><%= supplier.phone || '—' %></span></li>
+        <% if (supplier.fax) { %>
+        <li><span class="label">Fax</span><span class="value"><%= supplier.fax %></span></li>
+        <% } %>
+      </ul>
     </div>
 
-    <div class="col-lg-8">
-      <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white fw-semibold">
-          <i class="bi bi-bag me-2"></i>Productos de este proveedor
-        </div>
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>#</th>
-                <th>Producto</th>
-                <th>Precio</th>
-                <th>Envase</th>
-                <th>Estado</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <% if (!products || products.length === 0) { %>
-                <tr><td colspan="6" class="text-center text-muted py-3">Sin productos</td></tr>
-              <% } %>
-              <% (products || []).forEach(p => { %>
-              <tr>
-                <td class="text-muted"><%= p.id %></td>
-                <td class="fw-semibold"><%= p.productName %></td>
-                <td>$<%= p.unitPrice.toFixed(2) %></td>
-                <td><%= p.package || '—' %></td>
-                <td><span class="badge <%= p.isDiscontinued ? 'bg-secondary' : 'bg-success' %>"><%= p.isDiscontinued ? 'Descontinuado' : 'Activo' %></span></td>
-                <td><a href="/products/<%= p.id %>" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a></td>
-              </tr>
-              <% }) %>
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <div class="card" style="padding:0">
+      <div class="card-title" style="padding:16px 20px 12px;margin:0">Productos de este proveedor</div>
+      <div id="gridProductos"></div>
     </div>
   </div>
 </div>
 
 <%- include('../partials/footer') %>
+
+<script>
+  new DevExpress.ui.dxButton(document.getElementById('btnEditar'), {
+    text: 'Editar', icon: 'edit', type: 'default',
+    onClick: () => location.href = '/suppliers/<%= supplier.id %>/edit',
+  });
+
+  const products = <%- JSON.stringify(products || []) %>;
+
+  new DevExpress.ui.dxDataGrid(document.getElementById('gridProductos'), {
+    dataSource: products,
+    showBorders: false,
+    showRowLines: true,
+    paging: { pageSize: 10 },
+    pager: { showInfo: true },
+    columns: [
+      { dataField: 'productName',    caption: 'Producto' },
+      { dataField: 'unitPrice',      caption: 'Precio',  format: { type: 'currency', precision: 2 }, width: 100 },
+      { dataField: 'package',        caption: 'Envase',  width: 130 },
+      {
+        dataField: 'isDiscontinued', caption: 'Estado', width: 120,
+        cellTemplate: (el, info) => {
+          el.innerHTML = info.value
+            ? '<span class="badge badge-disc">Descontinuado</span>'
+            : '<span class="badge badge-active">Activo</span>';
+        },
+      },
+      {
+        type: 'buttons', width: 60,
+        buttons: [{ icon: 'eyeopen', hint: 'Ver', onClick: e => location.href = `/products/${e.row.data.id}` }],
+      },
+    ],
+  });
+</script>
