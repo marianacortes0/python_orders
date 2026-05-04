@@ -1,0 +1,23 @@
+@use "sass:math";
+@use "../sizes" as *;
+@use "../../base/treeList/variables" as *;
+
+// adduse
+
+$treelist-generic-expand-icon-size: null !default;
+
+@if $size == "default" {
+  $treelist-generic-expand-icon-size: 18px !default;
+}
+
+@else if $size == "compact" {
+  $treelist-generic-expand-icon-size: 14px !default;
+}
+
+$treelist-expand-icon-size: $treelist-generic-expand-icon-size !default;
+$treelist-expand-icon-name-expanded: spindown !default;
+$treelist-expand-icon-name-collapsed: spinright !default;
+$treelist-expand-icon-right-gap: 4px !default;
+$treelist-expand-checkbox-size: 16px !default;
+$treelist-expand-checkbox-right-gap: 8px !default;
+

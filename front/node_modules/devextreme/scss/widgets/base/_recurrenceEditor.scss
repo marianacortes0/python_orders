@@ -1,0 +1,50 @@
+$recurrence-interval-number-box-margin-top: 25px;
+$recurrence-radio-group-item-padding: 10px;
+$recurrence-button-group-item-padding: 8px;
+
+.dx-recurrence-repeat-on,
+.dx-recurrence-numberbox-interval-wrapper {
+  .dx-layout-manager .dx-field-item {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .dx-box-item:first-child:not(:only-child) {
+    flex-grow: 0 !important; // stylelint-disable-line declaration-no-important
+    min-width: auto !important; // stylelint-disable-line declaration-no-important
+  }
+}
+
+.dx-recurrence-numberbox-interval-wrapper {
+  .dx-field-item-label {
+    white-space: nowrap;
+  }
+}
+
+.dx-layout-manager .dx-field-item.dx-recurrence-repeat-on {
+  padding-top: 0;
+}
+
+.dx-recurrence-numberbox-interval-label {
+  margin-top: $recurrence-interval-number-box-margin-top;
+}
+
+.dx-recurrence-radiogroup-repeat-type {
+  margin: 0;
+
+  .dx-item {
+    padding-bottom: $recurrence-radio-group-item-padding;
+  }
+}
+
+.dx-recurrence-button-group {
+  width: 100%;
+
+  .dx-button-content {
+    padding: $recurrence-button-group-item-padding;
+  }
+
+  .dx-buttongroup-wrapper > div {
+    flex: 1;
+  }
+}

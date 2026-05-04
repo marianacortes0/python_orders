@@ -1,0 +1,75 @@
+﻿<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<div class="page">
+  <div class="page-header">
+    <h1 class="page-title">Pedidos</h1>
+    <div id="btnNuevo"></div>
+  </div>
+  <div class="card" style="padding:0">
+    <div id="gridPedidos"></div>
+  </div>
+</div>
+
+
+<script>
+  new DevExpress.ui.dxButton(document.getElementById('btnNuevo'), {
+    text: 'Nuevo Pedido', type: 'default', icon: 'plus',
+    onClick: () => location.href = '/orders/new',
+  });
+
+  const statusMap = {
+    pending:   { label: 'Pendiente',  cls: 'badge-pending' },
+    confirmed: { label: 'Confirmado', cls: 'badge-confirmed' },
+    shipped:   { label: 'Enviado',    cls: 'badge-shipped' },
+    delivered: { label: 'Entregado',  cls: 'badge-delivered' },
+    cancelled: { label: 'Cancelado',  cls: 'badge-cancelled' },
+  };
+
+  const store = new DevExpress.data.CustomStore({
+    key: 'id',
+    load: (opts) => {
+      const page  = Math.floor((opts.skip || 0) / (opts.take || 20)) + 1;
+      const limit = opts.take || 20;
+      const params = new URLSearchParams({ page, limit });
+      return fetch(`/api/orders?${params}`)
+        .then(r => r.json())
+        .then(d => ({ data: d.items, totalCount: d.total }));
+    },
+  });
+
+  new DevExpress.ui.dxDataGrid(document.getElementById('gridPedidos'), {
+    dataSource: store,
+    remoteOperations: { paging: true },
+    paging: { pageSize: 20 },
+    pager:  { showPageSizeSelector: true, allowedPageSizes: [10, 20, 50], showInfo: true },
+    filterRow:   { visible: true },
+    searchPanel: { visible: true, placeholder: 'Buscar...' },
+    showBorders: false,
+    showRowLines: true,
+    columnAutoWidth: true,
+    columns: [
+      { dataField: 'id',          caption: '#',         width: 60, allowFiltering: false },
+      { dataField: 'orderNumber', caption: 'N° Pedido', width: 140 },
+      {
+        caption: 'Cliente',
+        calculateCellValue: row => row.customer ? `${row.customer.firstName} ${row.customer.lastName}` : '',
+      },
+      { dataField: 'orderDate',   caption: 'Fecha', dataType: 'date', format: 'dd/MM/yyyy', width: 110 },
+      { dataField: 'totalAmount', caption: 'Total', format: { type: 'currency', precision: 2 }, width: 120 },
+      {
+        dataField: 'status', caption: 'Estado', width: 130,
+        cellTemplate: (el, info) => {
+          const s = statusMap[info.value] || { label: info.value, cls: '' };
+          el.innerHTML = `<span class="badge ${s.cls}">${s.label}</span>`;
+        },
+      },
+      {
+        type: 'buttons', width: 60,
+        buttons: [{ icon: 'eyeopen', hint: 'Ver', onClick: e => location.href = `/orders/${e.row.data.id}` }],
+      },
+    ],
+  });
+</script>
+
+<%- include('../partials/footer') %>

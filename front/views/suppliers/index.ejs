@@ -1,0 +1,62 @@
+﻿<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<div class="page">
+  <div class="page-header">
+    <h1 class="page-title">Proveedores</h1>
+    <div id="btnNuevo"></div>
+  </div>
+  <div class="card" style="padding:0">
+    <div id="gridProveedores"></div>
+  </div>
+</div>
+
+
+<script>
+  new DevExpress.ui.dxButton(document.getElementById('btnNuevo'), {
+    text: 'Nuevo Proveedor', type: 'default', icon: 'plus',
+    onClick: () => location.href = '/suppliers/new',
+  });
+
+  const store = new DevExpress.data.CustomStore({
+    key: 'id',
+    load: (opts) => {
+      const page  = Math.floor((opts.skip || 0) / (opts.take || 20)) + 1;
+      const limit = opts.take || 20;
+      const params = new URLSearchParams({ page, limit });
+      if (opts.searchValue) params.append('search', opts.searchValue);
+      return fetch(`/api/suppliers?${params}`)
+        .then(r => r.json())
+        .then(d => ({ data: d.items, totalCount: d.total }));
+    },
+  });
+
+  new DevExpress.ui.dxDataGrid(document.getElementById('gridProveedores'), {
+    dataSource: store,
+    remoteOperations: { paging: true },
+    paging: { pageSize: 20 },
+    pager:  { showPageSizeSelector: true, allowedPageSizes: [10, 20, 50], showInfo: true },
+    filterRow:   { visible: true },
+    searchPanel: { visible: true, placeholder: 'Buscar...' },
+    showBorders: false,
+    showRowLines: true,
+    columnAutoWidth: true,
+    columns: [
+      { dataField: 'id',          caption: '#',         width: 60, allowFiltering: false },
+      { dataField: 'companyName', caption: 'Empresa' },
+      { dataField: 'contactName', caption: 'Contacto' },
+      { dataField: 'city',        caption: 'Ciudad' },
+      { dataField: 'country',     caption: 'País' },
+      { dataField: 'phone',       caption: 'Teléfono', allowFiltering: false },
+      {
+        type: 'buttons', width: 90,
+        buttons: [
+          { icon: 'eyeopen', hint: 'Ver',    onClick: e => location.href = `/suppliers/${e.row.data.id}` },
+          { icon: 'edit',    hint: 'Editar', onClick: e => location.href = `/suppliers/${e.row.data.id}/edit` },
+        ],
+      },
+    ],
+  });
+</script>
+
+<%- include('../partials/footer') %>

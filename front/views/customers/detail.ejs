@@ -1,0 +1,69 @@
+﻿<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<div class="page">
+  <div class="breadcrumb">
+    <a href="/customers">Clientes</a>
+    <span class="breadcrumb-sep">/</span>
+    <span><%= customer.firstName %> <%= customer.lastName %></span>
+  </div>
+
+  <div class="page-header">
+    <h1 class="page-title"><%= customer.firstName %> <%= customer.lastName %></h1>
+    <div style="display:flex;gap:8px">
+      <div id="btnEditar"></div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:300px 1fr;gap:20px">
+    <div class="card">
+      <div class="card-title">Datos del cliente</div>
+      <ul class="detail-list">
+        <li><span class="label">ID</span><span class="value"><%= customer.id %></span></li>
+        <li><span class="label">Ciudad</span><span class="value"><%= customer.city || '—' %></span></li>
+        <li><span class="label">País</span><span class="value"><%= customer.country || '—' %></span></li>
+        <li><span class="label">Teléfono</span><span class="value"><%= customer.phone || '—' %></span></li>
+      </ul>
+    </div>
+
+    <div class="card" style="padding:0">
+      <div class="card-title" style="padding:16px 20px 12px;margin:0">Pedidos del cliente</div>
+      <div id="gridPedidos"></div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  new DevExpress.ui.dxButton(document.getElementById('btnEditar'), {
+    text: 'Editar', icon: 'edit', type: 'default',
+    onClick: () => location.href = '/customers/<%= customer.id %>/edit',
+  });
+
+  const orders = <%- JSON.stringify(orders || []) %>;
+
+  new DevExpress.ui.dxDataGrid(document.getElementById('gridPedidos'), {
+    dataSource: orders,
+    showBorders: false,
+    showRowLines: true,
+    paging: { pageSize: 10 },
+    pager: { showInfo: true },
+    columns: [
+      { dataField: 'orderNumber', caption: 'N° Pedido', width: 130 },
+      { dataField: 'orderDate',   caption: 'Fecha', dataType: 'date', format: 'dd/MM/yyyy', width: 110 },
+      { dataField: 'totalAmount', caption: 'Total', format: { type: 'currency', precision: 2 }, width: 110 },
+      {
+        dataField: 'status', caption: 'Estado', width: 120,
+        cellTemplate: (el, info) => {
+          el.innerHTML = `<span class="badge badge-${info.value}">${info.value}</span>`;
+        },
+      },
+      {
+        type: 'buttons', width: 60,
+        buttons: [{ icon: 'eyeopen', hint: 'Ver pedido', onClick: e => location.href = `/orders/${e.row.data.id}` }],
+      },
+    ],
+  });
+</script>
+
+<%- include('../partials/footer') %>

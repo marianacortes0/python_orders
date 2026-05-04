@@ -1,0 +1,23 @@
+{
+  "sideEffects": [
+    "../../esm/__internal/viz/tree_map/tiling.squarified.js",
+    "../../esm/__internal/viz/tree_map/tiling.strip.js",
+    "../../esm/__internal/viz/tree_map/tiling.slice_and_dice.js",
+    "../../esm/__internal/viz/tree_map/tiling.rotated_slice_and_dice.js",
+    "../../esm/__internal/viz/tree_map/colorizing.discrete.js",
+    "../../esm/__internal/viz/tree_map/colorizing.gradient.js",
+    "../../esm/__internal/viz/tree_map/colorizing.range.js",
+    "../../esm/__internal/viz/tree_map/api.js",
+    "../../esm/__internal/viz/tree_map/hover.js",
+    "../../esm/__internal/viz/tree_map/states.js",
+    "../../esm/__internal/viz/tree_map/selection.js",
+    "../../esm/__internal/viz/tree_map/tooltip.js",
+    "../../esm/common/core/localization/currency.js",
+    "../../esm/__internal/viz/tree_map/tracker.js",
+    "../../esm/__internal/viz/tree_map/drilldown.js",
+    "../../esm/__internal/viz/tree_map/plain_data_source.js"
+  ],
+  "main": "../../cjs/viz/tree_map.js",
+  "module": "../../esm/viz/tree_map.js",
+  "typings": "../tree_map.d.ts"
+}

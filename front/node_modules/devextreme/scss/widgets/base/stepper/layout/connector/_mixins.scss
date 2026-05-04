@@ -1,0 +1,33 @@
+@mixin connector(
+  $connector-background-color,
+  $background-color,
+  $size,
+  $padding,
+  $thickness,
+) {
+  .dx-stepper-connector-container {
+    background-color: $connector-background-color;
+  }
+
+  .dx-stepper-connector-value {
+    background-color: $background-color;
+  }
+
+  .dx-stepper-connector-horizontal {
+    padding-inline: $padding;
+    height: $size;
+
+    .dx-stepper-connector-container {
+      height: $thickness;
+    }
+  }
+
+  .dx-stepper-connector-vertical {
+    padding-block: $padding;
+    width: $size;
+
+    .dx-stepper-connector-container {
+      width: $thickness;
+    }
+  }
+}

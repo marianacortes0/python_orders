@@ -1,0 +1,6 @@
+{
+  "sideEffects": false,
+  "main": "../../cjs/common/ai-integration.js",
+  "module": "../../esm/common/ai-integration.js",
+  "typings": "../ai-integration.d.ts"
+}
