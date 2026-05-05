@@ -172,6 +172,9 @@ class CustomerRepository:
     def update(self, customer: Customer, data: dict) -> Customer:
         return _patch(store.customers[customer.id], data)
 
+    def delete(self, customer: Customer) -> None:
+        store.customers.pop(customer.id, None)
+
 
 class ProductRepository:
     def _attach(self, product: Product) -> Product:
@@ -257,3 +260,6 @@ class SupplierRepository:
 
     def update(self, supplier: Supplier, data: dict) -> Supplier:
         return _patch(store.suppliers[supplier.id], data)
+
+    def delete(self, supplier: Supplier) -> None:
+        store.suppliers.pop(supplier.id, None)

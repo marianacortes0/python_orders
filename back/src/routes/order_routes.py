@@ -58,9 +58,10 @@ def update_order(order_id: int, payload: OrderUpdate, service: OrderService = De
     return service.update(order_id, payload)
 
 
-@router.delete("/{order_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Eliminar pedido")
+@router.delete("/{order_id}", status_code=status.HTTP_200_OK, summary="Eliminar pedido")
 def delete_order(order_id: int, service: OrderService = Depends(svc)):
     service.delete(order_id)
+    return {"message": "eliminado exitosamente"}
 
 
 @router.get("/{order_id}/items", response_model=list[OrderItemRead], summary="Listar items")

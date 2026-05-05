@@ -49,6 +49,7 @@ def update_product(product_id: int, payload: ProductUpdate, service: ProductServ
     return service.update(product_id, payload)
 
 
-@router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Eliminar producto")
+@router.delete("/{product_id}", status_code=status.HTTP_200_OK, summary="Eliminar producto")
 def delete_product(product_id: int, service: ProductService = Depends(svc)):
     service.delete(product_id)
+    return {"message": "eliminado exitosamente"}
