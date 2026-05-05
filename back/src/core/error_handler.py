@@ -20,7 +20,7 @@ def _body(code: int, error: str, message: str, errors: list | None = None) -> di
 def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(AppException)
     async def _(request: Request, exc: AppException):
-        return JSONResponse(exc.status_code, _body(exc.status_code, type(exc).__name__, exc.detail))
+        return JSONResponse(status_code=exc.status_code, content=_body(exc.status_code, type(exc).__name__, exc.detail))
 
     @app.exception_handler(RequestValidationError)
     async def _(request: Request, exc: RequestValidationError):
@@ -32,16 +32,16 @@ def register_error_handlers(app: FastAPI) -> None:
             }
             for e in exc.errors()
         ]
-        return JSONResponse(400, _body(400, "ValidationError", "Datos inválidos en la solicitud", errors))
+        return JSONResponse(status_code=400, content=_body(400, "ValidationError", "Datos inválidos en la solicitud", errors))
 
     @app.exception_handler(StarletteHTTPException)
     async def _(request: Request, exc: StarletteHTTPException):
         name = {400: "BadRequestError", 404: "NotFoundError", 409: "ConflictError"}.get(
             exc.status_code, "HTTPException"
         )
-        return JSONResponse(exc.status_code, _body(exc.status_code, name, str(exc.detail)))
+        return JSONResponse(status_code=exc.status_code, content=_body(exc.status_code, name, str(exc.detail)))
 
     @app.exception_handler(Exception)
     async def _(request: Request, exc: Exception):
         logger.exception("Unhandled error: %s", exc)
-        return JSONResponse(500, _body(500, "InternalServerError", "Error interno del servidor"))
+        return JSONResponse(status_code=500, content=_body(500, "InternalServerError", "Error interno del servidor"))
