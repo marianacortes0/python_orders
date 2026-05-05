@@ -39,9 +39,16 @@ def get_customer(customer_id: int, service: CustomerService = Depends(svc)):
     return service.get(customer_id)
 
 
-@router.patch("/{customer_id}", response_model=CustomerRead, summary="Actualizar cliente")
+@router.patch("/{customer_id}", response_model=CustomerRead, summary="Actualizar cliente (parcial)")
+@router.put("/{customer_id}", response_model=CustomerRead, summary="Actualizar cliente (completo)")
 def update_customer(customer_id: int, payload: CustomerUpdate, service: CustomerService = Depends(svc)):
     return service.update(customer_id, payload)
+
+
+@router.delete("/{customer_id}", status_code=status.HTTP_200_OK, summary="Eliminar cliente")
+def delete_customer(customer_id: int, service: CustomerService = Depends(svc)):
+    service.delete(customer_id)
+    return {"message": "eliminado exitosamente"}
 
 
 @router.get("/{customer_id}/orders", response_model=list[OrderRead], summary="Pedidos del cliente")

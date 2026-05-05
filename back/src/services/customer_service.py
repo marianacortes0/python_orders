@@ -27,3 +27,7 @@ class CustomerService:
     def update(self, customer_id: int, payload: CustomerUpdate) -> Customer:
         customer = self.get(customer_id)
         return self.repo.update(customer, payload.model_dump(exclude_unset=True))
+
+    def delete(self, customer_id: int) -> None:
+        customer = self.get(customer_id)
+        self.repo.delete(customer)

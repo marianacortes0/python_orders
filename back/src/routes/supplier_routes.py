@@ -38,9 +38,16 @@ def get_supplier(supplier_id: int, service: SupplierService = Depends(svc)):
     return service.get(supplier_id)
 
 
-@router.patch("/{supplier_id}", response_model=SupplierRead, summary="Actualizar proveedor")
+@router.patch("/{supplier_id}", response_model=SupplierRead, summary="Actualizar proveedor (parcial)")
+@router.put("/{supplier_id}", response_model=SupplierRead, summary="Actualizar proveedor (completo)")
 def update_supplier(supplier_id: int, payload: SupplierUpdate, service: SupplierService = Depends(svc)):
     return service.update(supplier_id, payload)
+
+
+@router.delete("/{supplier_id}", status_code=status.HTTP_200_OK, summary="Eliminar proveedor")
+def delete_supplier(supplier_id: int, service: SupplierService = Depends(svc)):
+    service.delete(supplier_id)
+    return {"message": "eliminado exitosamente"}
 
 
 @router.get("/{supplier_id}/products", response_model=list[ProductRead], summary="Productos del proveedor")

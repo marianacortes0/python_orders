@@ -27,3 +27,7 @@ class SupplierService:
     def update(self, supplier_id: int, payload: SupplierUpdate) -> Supplier:
         supplier = self.get(supplier_id)
         return self.repo.update(supplier, payload.model_dump(exclude_unset=True))
+
+    def delete(self, supplier_id: int) -> None:
+        supplier = self.get(supplier_id)
+        self.repo.delete(supplier)
