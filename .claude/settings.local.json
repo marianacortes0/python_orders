@@ -5,7 +5,23 @@
       "Bash(python -c ' *)",
       "Bash(pip install *)",
       "Bash(rm -f orders.db)",
-      "Bash(cp -n Orders.json Orders.json)"
+      "Bash(cp -n Orders.json Orders.json)",
+      "Bash(python -c \"from main import app; print\\('OK'\\)\")",
+      "Bash(python -c \"import main\")",
+      "Bash(python -m uvicorn main:app --host 127.0.0.1 --port 8000)",
+      "Bash(curl -s http://127.0.0.1:8000/health)",
+      "Bash(python -c \"from src.core.config import settings; print\\('HOST:', settings.HOST, '| PORT:', settings.PORT\\)\")",
+      "Bash(taskkill /F /IM python.exe /T)",
+      "Bash(taskkill /F /IM uvicorn.exe /T)",
+      "PowerShell(Stop-Process -Name python -Force -ErrorAction SilentlyContinue)",
+      "PowerShell(Stop-Process -Name uvicorn -Force -ErrorAction SilentlyContinue)",
+      "Bash(python -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload)",
+      "PowerShell(Get-ChildItem c:\\\\Users\\\\maria\\\\python_orders -Name | Where-Object { $_ -notmatch \"^venv\" -and $_ -notmatch \"^node_modules\" })",
+      "PowerShell(Get-ChildItem \"c:\\\\Users\\\\maria\\\\python_orders\\\\front\" -Recurse -File | Where-Object { $_.DirectoryName -notmatch \"node_modules\" } | Select-Object FullName, Length)",
+      "PowerShell(\\(Get-Content \"c:\\\\Users\\\\maria\\\\python_orders\\\\front\\\\node_modules\\\\devextreme\\\\bundles\\\\dx.all.js\" -TotalCount 5\\) -join \"`n\")",
+      "PowerShell(Select-String -Path \"c:\\\\Users\\\\maria\\\\python_orders\\\\front\\\\node_modules\\\\devextreme\\\\bundles\\\\dx.all.js\" -Pattern \"DevExpress\" | Select-Object -First 5 | ForEach-Object { $_.Line.Substring\\(0, [Math]::Min\\(200, $_.Line.Length\\)\\) })",
+      "PowerShell(\\(Get-Content \"c:\\\\Users\\\\maria\\\\python_orders\\\\front\\\\node_modules\\\\devextreme\\\\bundles\\\\dx.all.js\" | Select-Object -Skip 10 -First 10\\) -join \"`n\")",
+      "PowerShell(Get-ChildItem c:\\\\Users\\\\maria\\\\python_orders | Where-Object { $_.Name -ne \"venv\" } | Select-Object Name, PSIsContainer)"
     ]
   }
 }

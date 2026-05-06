@@ -1,76 +1,68 @@
+from __future__ import annotations
+from dataclasses import dataclass, field
 from datetime import datetime
-
-from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
-
-from src.core.database import Base
+from enum import Enum
+from typing import Optional
 
 
-class Supplier(Base):
-    __tablename__ = "suppliers"
-
-    id = Column(Integer, primary_key=True, index=True)
-    company_name = Column(String(120), nullable=False, index=True)
-    contact_name = Column(String(120), nullable=True)
-    contact_title = Column(String(120), nullable=True)
-    city = Column(String(120), nullable=True)
-    country = Column(String(120), nullable=True)
-    phone = Column(String(50), nullable=True)
-    fax = Column(String(50), nullable=True)
-
-    products = relationship("Product", back_populates="supplier")
+class OrderStatus(str, Enum):
+    PENDING = "pending"
+    CONFIRMED = "confirmed"
+    SHIPPED = "shipped"
+    DELIVERED = "delivered"
+    CANCELLED = "cancelled"
 
 
-class Product(Base):
-    __tablename__ = "products"
-
-    id = Column(Integer, primary_key=True, index=True)
-    product_name = Column(String(150), nullable=False, index=True)
-    supplier_id = Column(Integer, ForeignKey("suppliers.id"), nullable=False)
-    unit_price = Column(Float, nullable=False)
-    package = Column(String(120), nullable=True)
-    is_discontinued = Column(Integer, nullable=False, default=0)
-
-    supplier = relationship("Supplier", back_populates="products")
-    items = relationship("OrderItem", back_populates="product")
+@dataclass
+class Supplier:
+    id: int
+    company_name: str
+    contact_name: Optional[str] = None
+    contact_title: Optional[str] = None
+    city: Optional[str] = None
+    country: Optional[str] = None
+    phone: Optional[str] = None
+    fax: Optional[str] = None
 
 
-class Customer(Base):
-    __tablename__ = "customers"
-
-    id = Column(Integer, primary_key=True, index=True)
-    first_name = Column(String(80), nullable=False)
-    last_name = Column(String(80), nullable=False)
-    city = Column(String(120), nullable=True)
-    country = Column(String(120), nullable=True)
-    phone = Column(String(50), nullable=True)
-
-    orders = relationship("Order", back_populates="customer")
+@dataclass
+class Product:
+    id: int
+    product_name: str
+    supplier_id: int
+    unit_price: float
+    package: Optional[str] = None
+    is_discontinued: bool = False
+    supplier: Optional["Supplier"] = field(default=None, compare=False, repr=False)
 
 
-class Order(Base):
-    __tablename__ = "orders"
-
-    id = Column(Integer, primary_key=True, index=True)
-    order_number = Column(String(50), unique=True, nullable=False, index=True)
-    order_date = Column(DateTime, nullable=False, default=datetime.utcnow)
-    total_amount = Column(Float, nullable=False, default=0.0)
-    customer_id = Column(Integer, ForeignKey("customers.id"), nullable=False)
-
-    customer = relationship("Customer", back_populates="orders")
-    items = relationship(
-        "OrderItem", back_populates="order", cascade="all, delete-orphan"
-    )
+@dataclass
+class Customer:
+    id: int
+    first_name: str
+    last_name: str
+    city: Optional[str] = None
+    country: Optional[str] = None
+    phone: Optional[str] = None
 
 
-class OrderItem(Base):
-    __tablename__ = "order_items"
+@dataclass
+class Order:
+    id: int
+    order_number: str
+    order_date: datetime
+    total_amount: float
+    customer_id: int
+    status: OrderStatus = OrderStatus.PENDING
+    customer: Optional["Customer"] = field(default=None, compare=False, repr=False)
+    items: list = field(default_factory=list, compare=False, repr=False)
 
-    id = Column(Integer, primary_key=True, index=True)
-    order_id = Column(Integer, ForeignKey("orders.id"), nullable=False)
-    product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
-    unit_price = Column(Float, nullable=False)
-    quantity = Column(Integer, nullable=False)
 
-    order = relationship("Order", back_populates="items")
-    product = relationship("Product", back_populates="items")
+@dataclass
+class OrderItem:
+    id: int
+    order_id: int
+    product_id: int
+    unit_price: float
+    quantity: int
+    product: Optional["Product"] = field(default=None, compare=False, repr=False)

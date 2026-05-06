@@ -1,84 +1,86 @@
-from fastapi import APIRouter, Depends, Query, status
-from sqlalchemy.orm import Session
+from __future__ import annotations
+from datetime import datetime
+from typing import List, Optional
 
-from src.core.database import get_db
-from src.schemas.order import ErrorResponse, OrderCreate, OrderRead, OrderUpdate
+from fastapi import Depends, Query, status
+
+from src.models.order import OrderStatus
+from src.schemas.common import CamelAPIRouter, ErrorResponse, PaginatedResponse
+from src.schemas.order import OrderCreate, OrderItemAdd, OrderItemRead, OrderItemUpdate, OrderRead, OrderReplace, OrderUpdate
 from src.services.order_service import OrderService
 
-router = APIRouter(
+router = CamelAPIRouter(
     prefix="/orders",
     tags=["Orders"],
     responses={
-        404: {"model": ErrorResponse, "description": "Orden no encontrada"},
-        409: {"model": ErrorResponse, "description": "Conflicto"},
-        422: {"model": ErrorResponse, "description": "Datos inválidos"},
+        400: {"model": ErrorResponse},
+        404: {"model": ErrorResponse},
+        409: {"model": ErrorResponse},
+        500: {"model": ErrorResponse},
     },
 )
 
 
-def get_order_service(db: Session = Depends(get_db)) -> OrderService:
-    return OrderService(db)
+def svc() -> OrderService:
+    return OrderService()
 
 
-@router.post(
-    "",
-    response_model=OrderRead,
-    status_code=status.HTTP_201_CREATED,
-    summary="Crear una nueva orden",
-)
-def create_order(
-    payload: OrderCreate,
-    service: OrderService = Depends(get_order_service),
-):
-    return service.create_order(payload)
-
-
-@router.get(
-    "",
-    response_model=list[OrderRead],
-    summary="Listar órdenes",
-)
+@router.get("", response_model=PaginatedResponse[OrderRead], summary="Listar pedidos")
 def list_orders(
-    skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=500),
-    service: OrderService = Depends(get_order_service),
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=200),
+    customer_id: Optional[int] = Query(None, alias="customerId"),
+    date_from: Optional[datetime] = Query(None, alias="dateFrom"),
+    date_to: Optional[datetime] = Query(None, alias="dateTo"),
+    status_filter: Optional[OrderStatus] = Query(None, alias="status"),
+    sort: Optional[str] = None,
+    service: OrderService = Depends(svc),
 ):
-    return service.list_orders(skip=skip, limit=limit)
+    items, total = service.list(page, limit, customer_id, date_from, date_to, status_filter, sort)
+    return {"items": items, "page": page, "limit": limit, "total": total}
 
 
-@router.get(
-    "/{order_id}",
-    response_model=OrderRead,
-    summary="Obtener una orden por id",
-)
-def get_order(
-    order_id: int,
-    service: OrderService = Depends(get_order_service),
-):
-    return service.get_order(order_id)
+@router.post("", response_model=OrderRead, status_code=status.HTTP_201_CREATED, summary="Crear pedido")
+def create_order(payload: OrderCreate, service: OrderService = Depends(svc)):
+    return service.create(payload)
 
 
-@router.patch(
-    "/{order_id}",
-    response_model=OrderRead,
-    summary="Actualizar una orden",
-)
-def update_order(
-    order_id: int,
-    payload: OrderUpdate,
-    service: OrderService = Depends(get_order_service),
-):
-    return service.update_order(order_id, payload)
+@router.get("/{order_id}", response_model=OrderRead, summary="Detalle de pedido")
+def get_order(order_id: int, service: OrderService = Depends(svc)):
+    return service.get(order_id)
 
 
-@router.delete(
-    "/{order_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
-    summary="Eliminar una orden",
-)
-def delete_order(
-    order_id: int,
-    service: OrderService = Depends(get_order_service),
-):
-    service.delete_order(order_id)
-    return None
+@router.put("/{order_id}", response_model=OrderRead, summary="Reemplazar pedido")
+def replace_order(order_id: int, payload: OrderReplace, service: OrderService = Depends(svc)):
+    return service.replace(order_id, payload)
+
+
+@router.patch("/{order_id}", response_model=OrderRead, summary="Actualizar pedido")
+def update_order(order_id: int, payload: OrderUpdate, service: OrderService = Depends(svc)):
+    return service.update(order_id, payload)
+
+
+@router.delete("/{order_id}", status_code=status.HTTP_200_OK, summary="Eliminar pedido")
+def delete_order(order_id: int, service: OrderService = Depends(svc)):
+    service.delete(order_id)
+    return {"message": "eliminado exitosamente"}
+
+
+@router.get("/{order_id}/items", response_model=List[OrderItemRead], summary="Listar items")
+def list_items(order_id: int, service: OrderService = Depends(svc)):
+    return service.list_items(order_id)
+
+
+@router.post("/{order_id}/items", response_model=OrderItemRead, status_code=status.HTTP_201_CREATED, summary="Agregar item")
+def add_item(order_id: int, payload: OrderItemAdd, service: OrderService = Depends(svc)):
+    return service.add_item(order_id, payload)
+
+
+@router.patch("/{order_id}/items/{item_id}", response_model=OrderItemRead, summary="Actualizar item")
+def update_item(order_id: int, item_id: int, payload: OrderItemUpdate, service: OrderService = Depends(svc)):
+    return service.update_item(order_id, item_id, payload)
+
+
+@router.delete("/{order_id}/items/{item_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Eliminar item")
+def delete_item(order_id: int, item_id: int, service: OrderService = Depends(svc)):
+    service.delete_item(order_id, item_id)

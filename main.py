@@ -1,9 +1,9 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.responses import Response
 
 from src.core.config import settings
-from src.core.database import init_db
 from src.core.error_handler import register_error_handlers
 from src.core.seed import seed_database
 from src.routes import router
@@ -11,7 +11,6 @@ from src.routes import router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    init_db()
     seed_database()
     yield
 
@@ -22,21 +21,21 @@ app = FastAPI(
     version=settings.APP_VERSION,
     docs_url="/docs",
     redoc_url="/redoc",
-    openapi_url="/openapi.json",
     lifespan=lifespan,
 )
 
 register_error_handlers(app)
-app.include_router(router)
+app.include_router(router, prefix=settings.API_PREFIX)
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    return Response(status_code=204)
 
 
 @app.get("/", tags=["Health"])
 def root():
-    return {
-        "message": "Bienvenido a Python Orders API",
-        "docs": "/docs",
-        "version": settings.APP_VERSION,
-    }
+    return {"message": "Python Orders API", "docs": "/docs", "version": settings.APP_VERSION}
 
 
 @app.get("/health", tags=["Health"])
