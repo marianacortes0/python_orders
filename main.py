@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.responses import Response
 
 from src.core.config import settings
+from fastapi.middleware.cors import CORSMiddleware
 from src.core.error_handler import register_error_handlers
 from src.core.seed import seed_database
 from src.routes import router
@@ -22,6 +23,14 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
     lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Permite peticiones de cualquier dominio (Vercel, localhost, etc)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 register_error_handlers(app)
