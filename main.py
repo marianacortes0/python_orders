@@ -27,7 +27,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Permite peticiones de cualquier dominio (Vercel, localhost, etc)
+    allow_origins=["*"],  # Permite peticiones de cualquier dominio (Vercel, localhost, etc)rr
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
